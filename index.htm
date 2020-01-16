@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Display a popup</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; };
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoianNhd3llcnVyaSIsImEiOiJjazU1bG5rNTIwdmlxM3JxaDlsc2d0cG1wIn0.SSTGVawTA-QzZhhvB_qogg';
+
+	// construct a new map with the uri/risd style centered over rhode island
+	var map = new mapboxgl.Map({
+		container: 'map',
+		style: 'mapbox://styles/jsawyeruri/ck55lsnas03an1co6tekab6z0',
+		center: [-71.483412, 41.730622],
+		zoom: 7
+	});
+	
+	// When a click event occurs on a feature in the places layer, open a popup at the
+	// location of the feature, with description HTML from its properties.
+	map.on('click', 'dams-gj-6zvrg8', function(e) {
+		var coordinates = e.features[0].geometry.coordinates.slice();
+		var state = e.features[0].properties.STATE;
+	
+		// Ensure that if the map is zoomed out such that multiple
+		// copies of the feature are visible, the popup appears
+		// over the copy being pointed to.
+		while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+			coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+		}
+		
+		new mapboxgl.Popup()
+			.setLngLat(coordinates)
+			.setHTML(state)
+			.addTo(map);
+	});
+	
+	// Change the cursor to a pointer when the mouse is over the places layer.
+	map.on('mouseenter', 'dams-gj-6zvrg8', function() {
+		map.getCanvas().style.cursor = 'pointer';
+	});
+	
+	// Change it back to a pointer when it leaves.
+	map.on('mouseleave', 'dams-gj-6zvrg8', function() {
+		map.getCanvas().style.cursor = '';
+	});
+</script>
+ 
+</body>
+</html>
